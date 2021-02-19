@@ -3,7 +3,9 @@
 #include "sdk/android/src/jni/jni_helpers.h"
 #include "sdk/android/src/jni/video_encoder_factory_wrapper.h"
 #include "sdk/android/src/jni/video_codec_info.h"
+#include "sdk/android/native_api/codecs/wrapper.h"
 #include "media/engine/simulcast_encoder_adapter.h"
+#include "rtc_base/logging.h"
 
 using namespace webrtc;
 using namespace webrtc::jni;
@@ -14,14 +16,15 @@ extern "C" {
 
 // (VideoEncoderFactory primary, VideoEncoderFactory fallback, VideoCodecInfo info)
 JNIEXPORT jlong JNICALL Java_org_webrtc_SimulcastVideoEncoder_nativeCreateEncoder(JNIEnv *env, jclass klass, jobject primary, jobject fallback, jobject info) {
-    JavaParamRef<jobject> primary_ref(primary);
-    JavaParamRef<jobject> fallback_ref(fallback);
+    RTC_LOG(LS_INFO) << "Create simulcast video encoder";
     JavaParamRef<jobject> info_ref(info);
-    VideoEncoderFactoryWrapper primary_factory(env, primary_ref);
-    VideoEncoderFactoryWrapper fallback_factory(env, fallback_ref);
     SdpVideoFormat format = VideoCodecInfoToSdpVideoFormat(env, info_ref);
-    return NativeToJavaPointer(std::make_unique<SimulcastEncoderAdapter>(&primary_factory, &fallback_factory, format).release());
+    return NativeToJavaPointer(std::make_unique<SimulcastEncoderAdapter>(
+			    JavaToNativeVideoEncoderFactory(env, primary).release(),
+			    JavaToNativeVideoEncoderFactory(env, fallback).release(),
+			    format).release());
 }
+
 
 #ifdef __cplusplus
 }

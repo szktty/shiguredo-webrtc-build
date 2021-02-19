@@ -812,6 +812,7 @@ if (current_os == "linux" || is_android) {
     deps = [
       ":base_jni",
       ":video_jni",
+      ":native_api_codecs",
       "../../media:rtc_simulcast_encoder_adapter"
     ]
   }
