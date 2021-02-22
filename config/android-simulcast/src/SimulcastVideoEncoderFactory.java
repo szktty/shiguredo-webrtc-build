@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays;
 
 public class SimulcastVideoEncoderFactory implements VideoEncoderFactory {
 
@@ -33,13 +34,9 @@ public class SimulcastVideoEncoderFactory implements VideoEncoderFactory {
 
     @Override
     public VideoCodecInfo[] getSupportedCodecs() {
-        return supportedCodecs();
-    }
-
-    static VideoCodecInfo[] supportedCodecs() {
         List<VideoCodecInfo> codecs = new ArrayList<VideoCodecInfo>();
-        codecs.add(new VideoCodecInfo("VP8", new HashMap<>()));
-	// TODO: H.264
+        codecs.addAll(Arrays.asList(primary.getSupportedCodecs()));
+        codecs.addAll(Arrays.asList(fallback.getSupportedCodecs()));
         return codecs.toArray(new VideoCodecInfo[codecs.size()]);
     }
 
